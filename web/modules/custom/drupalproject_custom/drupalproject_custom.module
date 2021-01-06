@@ -1,0 +1,19 @@
+<?php
+/**
+ * Implements hook_entity_presave()
+ */
+function drupalproject_custom_node_presave($node) {
+  if ($node->hasField('field_publish_date')) {
+    $status = $node->get('status')->getValue()[0]['value'];
+    if (empty($node->get('field_publish_date')->getValue())) {
+      if ($status == 1) {
+        $now = new DateTime();
+        $created = $now->getTimestamp();
+      }
+    }
+    if (!empty($created)) {
+      $pub_date = gmdate('Y-m-d\TH:i:s', $created);
+      $node->set('field_publish_date', $pub_date);
+    }
+  }
+}
