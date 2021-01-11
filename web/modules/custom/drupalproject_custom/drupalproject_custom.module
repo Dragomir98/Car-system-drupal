@@ -1,19 +1,16 @@
 <?php
-/**
- * Implements hook_entity_presave()
- */
-function drupalproject_custom_node_presave($node) {
-  if ($node->hasField('field_publish_date')) {
-    $status = $node->get('status')->getValue()[0]['value'];
-    if (empty($node->get('field_publish_date')->getValue())) {
-      if ($status == 1) {
-        $now = new DateTime();
-        $created = $now->getTimestamp();
-      }
-    }
-    if (!empty($created)) {
-      $pub_date = gmdate('Y-m-d\TH:i:s', $created);
-      $node->set('field_publish_date', $pub_date);
-    }
+
+function hook_block_access(\Drupal\block\Entity\Block $block, $operation, \Drupal\Core\Session\AccountInterface $account) {
+
+  // Example code that would prevent displaying the 'Powered by Drupal' block in
+  // a region different than the footer.
+  if ($operation == 'view' && $block
+    ->getPluginId() == 'system_powered_by_block') {
+    return AccessResult::forbiddenIf($block
+      ->getRegion() != 'footer')
+      ->addCacheableDependency($block);
   }
+
+  // No opinion.
+  return AccessResult::neutral();
 }
